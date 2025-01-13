@@ -51,3 +51,7 @@ instance.interceptors.response.use(function (res) {
 export function login(data: { username: string, password: string, _token: string }) {
   return instance.post('https://wallhaven.cc/auth/login', data)
 }
+
+export function getPage(url: string) {
+  return instance.get(url)
+}
