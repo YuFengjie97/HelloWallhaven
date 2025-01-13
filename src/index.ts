@@ -1,39 +1,59 @@
 import readlineSync from 'readline-sync'
 import { login, instance } from './api';
+import * as cheerio from 'cheerio';
 import user from '../user.json'
 
-async function testNet() {
-  const res = await instance.get('https://wallhaven.cc/')
-  if(res.status === 200) {
-    return true
+
+
+/**
+ * 在进入login页面时,
+ * 1. 从生成的页面中的表单html元素input获取_token
+ */
+async function getToken() {
+  try {
+    const res = await instance.get('https://wallhaven.cc/login')
+    if (res.status === 200) {
+      const html = res.data
+
+      const $ = cheerio.load(html)
+      const $token = $('input[name=_token]')
+      const token = $token.attr('value')
+
+      if (!token) {
+        throw Error('login页面不存在token')
+      }
+      return token
+    } else {
+      throw Error('login页面,状态码不为200')
+    }
+  } catch (e) {
+    console.error('login页面,访问失败')
+    throw e
   }
-  return false
 }
 
 async function goLogin() {
   // const username = readlineSync.question('input username: ')
   // const password = readlineSync.question('input password: ')
+
   const username = user.username
   const password = user.password
-  const _token = '6JYAlqB4ldB0Ce197oqFXrJ06yoyIuLHAlnIxkzn'
-  console.log({ username, password });
-  // try{
-  //   const res = await login({ username, password, _token })
-  //   console.log(res.status);
-  // }catch(e){
-  //   console.log(e);
-  // }
+  const token = await getToken()
+  console.log({ username, password, token });
+
+  try {
+    const res = await login({ username, password, _token: token })
+    if (res.status === 200) {
+      console.log('-------登录成功-------');
+    } else {
+      console.log(`------登录失败--状态码: ${res.status}-----`)
+    }
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 
 ; (async () => {
-  const isNetWork = await testNet()
-  if(isNetWork){
-    console.log('网络可用');
-  }else{
-    console.log('网络不可用,需要科学上网');
-    return
-  }
-
   await goLogin()
 })()

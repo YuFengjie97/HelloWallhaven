@@ -10,11 +10,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
     "@types/readline-sync": "^1.4.8",
     "axios": "^1.7.9",
     "cheerio": "^1.0.0",
     "readline-sync": "^1.4.10",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "cookie": "^1.0.2",
+    "fs-extra": "^11.2.0"
   }
 }
